@@ -27,9 +27,9 @@ def read_command():
     elif (command == "quit"):
         quit()
     elif (command == "solve"):
-        solve()
+        solve(0)
     elif (command == "validate"):
-        validate_grid()
+        validate_grid(True)
     else:
         print("'"+command+"' is not recognized as a command.")
         print("Type 'help' for more information.")
@@ -50,6 +50,20 @@ def init_grid():
         grid.append(column)
         for row in range(9):
         	column.append(0)
+
+def save_grid():
+    saved_grid = []
+    for col in range(9):
+        column = []
+        saved_grid.append(column)
+        for row in range(9):
+            column.append(grid[col][row])
+    return saved_grid
+
+def load_grid(saved_grid):   
+    for col in range(9):
+        for row in range(9):
+            grid[col][row] = saved_grid[col][row]
 
 def import_grid():
     file_name = input("  File name> ")
@@ -88,7 +102,9 @@ def print_grid():
         if (row < 8 and row%3 == 2):
             print()
 
-def validate_grid():
+def validate_grid(print_violations):
+    valid = True
+
     # Count how many times the values 1-9 appear in each row and column.
     row_frequencies = []
     column_frequencies = []
@@ -111,13 +127,17 @@ def validate_grid():
     for index in range(9):
         for value in range(1, 10):
             if (row_frequencies[index][value] > 1):
-                print("Value " + str(value) + 
-                      " occurs " + str(row_frequencies[index][value]) + 
-                      " times in row " + str(index+1))
+                valid = False
+                if (print_violations):
+                    print("Value " + str(value) + 
+                          " occurs " + str(row_frequencies[index][value]) + 
+                          " times in row " + str(index+1))
             if (column_frequencies[index][value] > 1):
-                print("Value " + str(value) + 
-                      " occurs " + str(column_frequencies[index][value]) +
-                      " times in column " + str(index+1))
+                valid = False
+                if (print_violations):
+                    print("Value " + str(value) + 
+                          " occurs " + str(column_frequencies[index][value]) +
+                          " times in column " + str(index+1))
 
     # Count how many times the values 1-9 appear in each subgrid.
     subgrid_frequencies = []
@@ -137,9 +157,21 @@ def validate_grid():
     for col in range(9):
         for row in range(9):
             if (len(moves[col][row]) == 0 and grid[col][row] == 0):
-                print("Cell at column " + str(col+1) +
-                      " and row " + str(row+1) + 
-                      " has no valid move.")
+                valid = False
+                if (print_violations):
+                    print("Cell at column " + str(col+1) +
+                          " and row " + str(row+1) + 
+                          " has no valid move.")
+
+    return valid
+
+def is_grid_solved():    
+    # If any if the cells is not filled out yet, the grid is not solved.
+    for col in range(9):
+        for row in range(9):
+            if (grid[col][row] == 0):
+                return False
+    return True
 
 def calculate_moves():
     # Start off with all values from 1-9 in each empty cell.
@@ -185,7 +217,7 @@ def calculate_moves():
 
     return moves
 
-def solve():   
+def solve(depth):  
     moves = None
 
     # Keep solving cells that have only one valid move.
@@ -195,14 +227,40 @@ def solve():
         move_applied = False
         for col in range(9):
             for row in range(9):
-                if(len(moves[col][row]) == 1):
+                if (len(moves[col][row]) == 1):
                     grid[col][row] = moves[col][row][0]
                     move_applied = True
-                    print_grid()
-                    print() 
-                    print() 
         
         if (not move_applied):
             break;
+
+    if(validate_grid(False)):    
+        if (is_grid_solved()):
+            return True
+        else:
+            # Try out uncertain moves and recursively try to solve from there.
+            for branch_factor in range(2,10):
+                for col in range(9):
+                    for row in range(9):
+                        branches = moves[col][row]
+                        if (len(branches) == branch_factor):
+                            for branch_index in range(len(branches)):
+                                saved_grid = save_grid()
+                                grid[col][row] = branches[branch_index]
+                                solved = solve(depth+1)
+                                if (solved):
+                                    return True
+                                else:
+                                    load_grid(saved_grid)
+
+                            # If none of the gambles worked out, the solver needs to backtrack.
+                            return False
+
+            # It should never reach this point since there should have been one unsolved cell.
+            raise RuntimeError("Solver failed")              
+    else:
+        # If no more moves are possible, the solver needs to backtrack.
+        return False
+
 
 main()
