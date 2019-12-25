@@ -1,4 +1,6 @@
 grid = []
+variants = ["Sudoku", "Sudoku X"]
+selected_variant = 0
 
 def main():
     welcome()
@@ -34,6 +36,8 @@ def read_command():
         solve(0)
     elif (command == "validate"):
         validate_grid(True)
+    elif (command == "variant"):
+        set_variant()
     else:
         print("'"+command+"' is not recognized as a command.")
         print("Type 'help' for more information.")
@@ -49,6 +53,7 @@ def print_help():
     print("solve    Solves the grid.")
     print("quit     Quits SudokuPy.")
     print("validate Validates the grid.")
+    print("variant  Sets the Sudoku variant being played.")
 
 def init_grid():
     for col in range(9):
@@ -225,6 +230,33 @@ def validate_grid(print_violations):
             for value in range(10):
                 subgrid_row_frequencies.append(0)
 
+    if (variants[selected_variant] == "Sudoku X"):
+        # Count how many times the values 1-9 appear in each diagonal.
+        diagonal1_frequencies = []
+        diagonal2_frequencies = []
+        for value in range(10):
+            diagonal1_frequencies.append(0)
+            diagonal2_frequencies.append(0)
+
+        for index in range(9):
+            diagonal1_frequencies[grid[index][index]] += 1
+            diagonal2_frequencies[grid[index][8-index]] += 1
+
+        # Print out duplicate values in each diagonal.
+        for value in range(1, 10):
+            if (diagonal1_frequencies[value] > 1):
+                valid = False
+                if (print_violations):
+                    print("Value " + str(value) + 
+                          " occurs " + str(diagonal1_frequencies[value]) + 
+                          " times in the first diagonal")
+            if (diagonal2_frequencies[value] > 1):
+                valid = False
+                if (print_violations):
+                    print("Value " + str(value) + 
+                          " occurs " + str(diagonal2_frequencies[value]) + 
+                          " times in the second diagonal")
+
     # Calculate possibles moves for each cell.
     moves = calculate_moves()
 
@@ -239,6 +271,16 @@ def validate_grid(print_violations):
                           " has no valid move.")
 
     return valid
+
+def set_variant():
+    global selected_variant
+    for variant in range(len(variants)):
+        print("[" + str(variant+1) + "] " + variants[variant], end="")
+        if (variant == selected_variant):
+            print(" (selected)")
+        else:
+            print()
+    selected_variant = input_value("Choose variant", 1, len(variants))-1
 
 def is_grid_solved():    
     # If any if the cells is not filled out yet, the grid is not solved.
@@ -261,7 +303,7 @@ def calculate_moves():
             column.append(values)
         moves.append(column)
     
-    # Remove values that would introduce duplicates in the row, column or subgrid it is in.
+    # Remove values that would introduce duplicates in the row, column, diagonal or subgrid it is in.
     for col in range(9):
         for row in range(9):
             cell = grid[col][row]
@@ -279,6 +321,22 @@ def calculate_moves():
                     moves[col][index].remove(cell)
                 finally:
                     continue     
+
+            if (variants[selected_variant] == "Sudoku X"):
+                if(row == col):
+                    # Remove values in the same diagonal.
+                    for index in range(9):
+                        try:
+                            moves[index][index].remove(cell)
+                        finally:
+                            continue  
+                if(row == 8-col):
+                    # Remove values in the same diagonal.
+                    for index in range(9):
+                        try:
+                            moves[index][8-index].remove(cell)
+                        finally:
+                            continue  
 
             # Remove values in the same subgrid.
             left_col = int(col/3)*3
