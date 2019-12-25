@@ -24,6 +24,8 @@ def read_command():
         import_grid()
     elif (command == "input"):
         input_grid()
+    elif (command == "move"):
+        move()
     elif (command == "print"):
         print_grid()
     elif (command == "quit"):
@@ -42,6 +44,7 @@ def print_help():
     print("help     Provides help for SudokuPy commands.")
     print("import   Imports a grid from a file.")
     print("input    Inputs a grid from the command line.")
+    print("move     Fills out one value on the grid.")
     print("print    Prints the grid.")
     print("solve    Solves the grid.")
     print("quit     Quits SudokuPy.")
@@ -105,7 +108,26 @@ def import_row(row, new_row):
         if (ord("0") < ord(newCell) and ord(newCell) <= ord("9")):
             grid[col][row] = int(newCell)     
         else:
-            grid[col][row] = 0             
+            grid[col][row] = 0
+
+def move():
+    col = input_value("Column", 1, 9)
+    row = input_value("Row", 1, 9)
+    value = input_value("Value", 1, 9)
+    grid[col-1][row-1] = value
+
+def input_value(name, min, max):
+    value = None
+    while(value == None):
+        value_str = input("  " + name + " (" + str(min) + "-" + str(max) + ")> ")
+        try:
+            value = int(value_str)
+            if (value<min or value>max):
+                print("'" + value_str + "' is out of range (" + str(min) + "-" + str(max) + ")")
+                value = None
+        except:
+            print("'" + value_str + "' is not a number")
+    return value
                 
 def print_grid():
     for row in range(9):
