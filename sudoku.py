@@ -15,7 +15,7 @@ def read_command():
     if(command == ""):
         return
     elif (command == "clear"):
-        init_grid()
+        clear_grid()
     elif (command == "help"):
         print_help()
     elif (command == "import"):
@@ -50,6 +50,11 @@ def init_grid():
         grid.append(column)
         for row in range(9):
         	column.append(0)
+
+def clear_grid():
+    for col in range(9):
+        for row in range(9):
+            grid[col][row] = 0
 
 def save_grid():
     saved_grid = []
