@@ -16,6 +16,8 @@ def read_command():
         return
     elif (command == "clear"):
         clear_grid()
+    elif (command == "export"):
+        export_grid()
     elif (command == "help"):
         print_help()
     elif (command == "import"):
@@ -36,6 +38,7 @@ def read_command():
 
 def print_help():    
     print("clear    Clears the grid.")
+    print("export   Exports a grid to a file.")
     print("help     Provides help for SudokuPy commands.")
     print("import   Imports a grid from a file.")
     print("input    Inputs a grid from the command line.")
@@ -76,6 +79,20 @@ def import_grid():
     for row in range(9):
         new_row = file.readline()
         import_row(row, new_row)
+
+def export_grid():
+    file_name = input("  File name> ")
+    file = open(file_name, "w")
+    for row in range(9):
+        row_str = ""
+        for col in range(9):
+            if (grid[col][row] == 0):
+                row_str += "."
+            else:
+                row_str += str(grid[col][row])
+        file.write(row_str)
+        file.write('\n')
+    file.close()
 
 def input_grid():
     for row in range(9):
