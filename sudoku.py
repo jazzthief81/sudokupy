@@ -130,21 +130,52 @@ def input_value(name, min, max):
     return value
                 
 def print_grid():
+    # Print column numbers.
+    print_separator(short = True)
+    print("  |", end = "")
+    for col in range(9):
+        print(str(col+1), end = "")
+        if (col%3 == 2):
+            print("|", end = "")
+    print()
+
+    # Leave separator row after column numbers.
+    print_separator()
+
     for row in range(9):
+        # Print row number.
+        print("|", end = "")
+        print(str(row+1), end = "|")
+
         for col in range(9):
-            # Print cell value
+            # Print cell value.
             cell = grid[col][row]
             cell_as_string =  "." if cell == 0 else cell
             print(cell_as_string, end = "")
 
             # Leave open column between subgrids.
             if (col%3 == 2):
-                print(" ", end = "")
+                print("|", end = "")
         print()
 
-        # Leave open row between subgrids.
+        # Leave separator row between subgrids.
         if (row < 8 and row%3 == 2):
-            print()
+            print_separator()
+
+    # Leave separator row after all subgrids.
+    print_separator()
+
+def print_separator(short = False):
+    if(not short):
+        print("+-+", end = "")
+    else:
+        print("  +", end = "")
+
+    for col in range(9):
+        print("-", end = "")
+        if (col%3 == 2):
+            print("+", end = "")
+    print()
 
 def validate_grid(print_violations):
     valid = True
