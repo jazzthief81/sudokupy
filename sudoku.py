@@ -33,6 +33,8 @@ def read_command():
         print_grid()
     elif (command == "quit"):
         quit()
+    elif (command == "remove"):
+        remove()
     elif (command == "solve"):
         solve(0)
     elif (command == "validate"):
@@ -51,6 +53,7 @@ def print_help():
     print("input    Inputs a grid from the command line.")
     print("move     Fills out one value on the grid.")
     print("print    Prints the grid.")
+    print("remove   Removes one value from the grid.")
     print("solve    Solves the grid.")
     print("quit     Quits SudokuPy.")
     print("validate Validates the grid.")
@@ -121,6 +124,11 @@ def move():
     row = input_value("Row", 1, 9)
     value = input_value("Value", 1, 9)
     grid[col-1][row-1] = value
+
+def remove():
+    col = input_value("Column", 1, 9)
+    row = input_value("Row", 1, 9)
+    grid[col-1][row-1] = 0
 
 def input_value(name, min, max):
     value = None
