@@ -1,4 +1,5 @@
 grid = []
+all_solutions = True
 variants = ["Sudoku", "Sudoku X"]
 selected_variant = 0
 
@@ -365,10 +366,11 @@ def solve(depth):
                     move_applied = True
         
         if (not move_applied):
-            break;
+            break
 
     if(validate_grid(False)):    
         if (is_grid_solved()):
+            print_grid()
             return True
         else:
             # Try out uncertain moves and recursively try to solve from there.
@@ -377,17 +379,19 @@ def solve(depth):
                     for row in range(9):
                         branches = moves[col][row]
                         if (len(branches) == branch_factor):
+                            nb_solved_branches = 0
                             for branch_index in range(len(branches)):
                                 saved_grid = save_grid()
                                 grid[col][row] = branches[branch_index]
                                 solved = solve(depth+1)
                                 if (solved):
-                                    return True
-                                else:
-                                    load_grid(saved_grid)
+                                    nb_solved_branches += 1
+                                    if(not all_solutions):
+                                        break
+                                load_grid(saved_grid)
 
                             # If none of the gambles worked out, the solver needs to backtrack.
-                            return False
+                            return nb_solved_branches > 0
 
             # It should never reach this point since there should have been one unsolved cell.
             raise RuntimeError("Solver failed")              
