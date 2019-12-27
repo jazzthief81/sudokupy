@@ -58,9 +58,9 @@ def print_help():
     print("input    Inputs a grid from the command line.")
     print("move     Fills out one value on the grid.")
     print("print    Prints the grid.")
+    print("quit     Quits SudokuPy.")
     print("remove   Removes one value from the grid.")
     print("solve    Solves the grid.")
-    print("quit     Quits SudokuPy.")
     print("validate Validates the grid.")
     print("variant  Sets the Sudoku variant being played.")
 
