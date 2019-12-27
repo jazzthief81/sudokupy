@@ -1,3 +1,5 @@
+import random
+
 grid = []
 all_solutions = True
 variants = ["Sudoku", "Sudoku X"]
@@ -21,6 +23,8 @@ def read_command():
         clear_grid()
     elif (command == "export"):
         export_grid()
+    elif (command == "generate"):
+        generate_grid()
     elif (command == "help"):
         print_help()
     elif (command == "import"):
@@ -36,7 +40,7 @@ def read_command():
     elif (command == "remove"):
         remove()
     elif (command == "solve"):
-        solve(0)
+        solve(0, all_solutions, True)
     elif (command == "validate"):
         validate_grid(True)
     elif (command == "variant"):
@@ -48,6 +52,7 @@ def read_command():
 def print_help():    
     print("clear    Clears the grid.")
     print("export   Exports a grid to a file.")
+    print("generate Generates a grid with clues.")
     print("help     Provides help for SudokuPy commands.")
     print("import   Imports a grid from a file.")
     print("input    Inputs a grid from the command line.")
@@ -70,6 +75,38 @@ def clear_grid():
     for col in range(9):
         for row in range(9):
             grid[col][row] = 0
+
+def generate_grid():
+    nb_clues = input_value("Number of clues", 0, 9*9)
+    clear_grid()
+    for clue_index in range(nb_clues):
+        moves = calculate_moves()
+        cell_index = random.randrange(9*9 - clue_index)
+        [col,row] = get_empty_cell(cell_index)
+        moves_for_cell = moves[col][row]
+        if(len(moves_for_cell) > 0):
+            random_moves = random.sample(moves_for_cell, len(moves_for_cell))
+            saved_grid = save_grid()
+            for move_index in range(len(random_moves)):
+                #print("Trying move " + str(move_index+1) + " out of " + str(len(random_moves)))
+                grid[col][row] = random_moves[move_index]
+                moved_grid = save_grid()
+                if (solve(0, False, False)):
+                    #print("Clue " + str(clue_index + 1))
+                    load_grid(moved_grid)
+                    break
+                else:
+                    load_grid(saved_grid)
+        else:
+            raise RuntimeError("Generator failed")
+
+def get_empty_cell(cell_index):
+    for col in range(9):
+        for row in range(9):
+            if(grid[col][row] == 0):
+                cell_index -= 1
+                if(cell_index<0):
+                    return [col,row]
 
 def save_grid():
     saved_grid = []
@@ -359,7 +396,7 @@ def calculate_moves():
 
     return moves
 
-def solve(depth):  
+def solve(depth, all_solutions, print_solutions):  
     moves = None
 
     # Keep solving cells that have only one valid move.
@@ -378,7 +415,9 @@ def solve(depth):
 
     if(validate_grid(False)):    
         if (is_grid_solved()):
-            print_grid()
+            if (print_solutions):
+                print_grid()
+                print("Depth: "+str(depth))
             return True
         else:
             # Try out uncertain moves and recursively try to solve from there.
@@ -391,7 +430,7 @@ def solve(depth):
                             for branch_index in range(len(branches)):
                                 saved_grid = save_grid()
                                 grid[col][row] = branches[branch_index]
-                                solved = solve(depth+1)
+                                solved = solve(depth+1, all_solutions, print_solutions)
                                 if (solved):
                                     nb_solved_branches += 1
                                     if(not all_solutions):
