@@ -46,7 +46,7 @@ def read_command():
     elif (command == "variant"):
         set_variant()
     else:
-        print("'"+command+"' is not recognized as a command.")
+        print("'{}' is not recognized as a command.".format(command))
         print("Type 'help' for more information.")
 
 def print_help():    
@@ -88,11 +88,11 @@ def generate_grid():
             random_moves = random.sample(moves_for_cell, len(moves_for_cell))
             saved_grid = save_grid()
             for move_index in range(len(random_moves)):
-                #print("Trying move " + str(move_index+1) + " out of " + str(len(random_moves)))
+                #print("Trying move {} out of {}".format(move_index+1,len(random_moves)))
                 grid[col][row] = random_moves[move_index]
                 moved_grid = save_grid()
                 if (solve(0, False, False)):
-                    #print("Clue " + str(clue_index + 1))
+                    #print("Clue {}".format(clue_index + 1))
                     load_grid(moved_grid)
                     break
                 else:
@@ -145,7 +145,7 @@ def export_grid():
 
 def input_grid():
     for row in range(9):
-        new_row = input("  Row " + str(row+1) + "> ")
+        new_row = input("  Row {}> ".format(row+1))
         import_row(row, new_row)
 
 def import_row(row, new_row):
@@ -170,14 +170,14 @@ def remove():
 def input_value(name, min, max):
     value = None
     while(value == None):
-        value_str = input("  " + name + " (" + str(min) + "-" + str(max) + ")> ")
+        value_str = input("  {} ({}-{})> ".format(name, min, max))
         try:
             value = int(value_str)
             if (value<min or value>max):
-                print("'" + value_str + "' is out of range (" + str(min) + "-" + str(max) + ")")
+                print("'{}' is out of range ({}-{})".format(value_str, min, max))
                 value = None
         except:
-            print("'" + value_str + "' is not a number")
+            print("'{}' is not a number".format(value_str))
     return value
                 
 def print_grid():
@@ -255,15 +255,13 @@ def validate_grid(print_violations):
             if (row_frequencies[index][value] > 1):
                 valid = False
                 if (print_violations):
-                    print("Value " + str(value) + 
-                          " occurs " + str(row_frequencies[index][value]) + 
-                          " times in row " + str(index+1))
+                    print("Value {} occurs {} times in row {}".format(
+                        value, row_frequencies[index][value], index+1))
             if (column_frequencies[index][value] > 1):
                 valid = False
                 if (print_violations):
-                    print("Value " + str(value) + 
-                          " occurs " + str(column_frequencies[index][value]) +
-                          " times in column " + str(index+1))
+                    print("Value {} occurs {} times in column {}".format(
+                        value, column_frequencies[index][value], index+1))
 
     # Count how many times the values 1-9 appear in each subgrid.
     subgrid_frequencies = []
@@ -293,15 +291,13 @@ def validate_grid(print_violations):
             if (diagonal1_frequencies[value] > 1):
                 valid = False
                 if (print_violations):
-                    print("Value " + str(value) + 
-                          " occurs " + str(diagonal1_frequencies[value]) + 
-                          " times in the first diagonal")
+                    print("Value {} occurs {} times in the first diagonal".format(
+                        value, diagonal1_frequencies[value]))
             if (diagonal2_frequencies[value] > 1):
                 valid = False
                 if (print_violations):
-                    print("Value " + str(value) + 
-                          " occurs " + str(diagonal2_frequencies[value]) + 
-                          " times in the second diagonal")
+                    print("Value {} occurs {} times in the second diagonal".format(
+                        value, diagonal2_frequencies[value]))
 
     # Calculate possibles moves for each cell.
     moves = calculate_moves()
@@ -312,16 +308,15 @@ def validate_grid(print_violations):
             if (len(moves[col][row]) == 0 and grid[col][row] == 0):
                 valid = False
                 if (print_violations):
-                    print("Cell at column " + str(col+1) +
-                          " and row " + str(row+1) + 
-                          " has no valid move.")
+                    print("Cell at column {} and row {} has no valid move".format(
+                            col+1, row+1))
 
     return valid
 
 def set_variant():
     global selected_variant
     for variant in range(len(variants)):
-        print("[" + str(variant+1) + "] " + variants[variant], end="")
+        print("[{}] {}".format(variant+1, variants[variant]), end="")
         if (variant == selected_variant):
             print(" (selected)")
         else:
@@ -417,7 +412,7 @@ def solve(depth, all_solutions, print_solutions):
         if (is_grid_solved()):
             if (print_solutions):
                 print_grid()
-                print("Depth: "+str(depth))
+                print("Depth: {}".format(depth))
             return True
         else:
             # Try out uncertain moves and recursively try to solve from there.
