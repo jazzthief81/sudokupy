@@ -336,13 +336,13 @@ def calculate_moves():
     moves = []
     for col in range(9):
         column = []
+        moves.append(column)
         for row in range(9):
-            values = []
+            values = set()
+            column.append(values)
             if (grid[col][row] == 0):
                 for value in range(1, 10):
-                    values.append(value)
-            column.append(values)
-        moves.append(column)
+                    values.add(value)
     
     # Remove values that would introduce duplicates in the row, column, diagonal or subgrid it is in.
     for col in range(9):
@@ -351,43 +351,28 @@ def calculate_moves():
 
             # Remove values in the same row.
             for index in range(9):
-                try:
-                    moves[index][row].remove(cell)
-                finally:
-                    continue  
+                moves[index][row].discard(cell)
 
             # Remove values in the same column.
             for index in range(9):
-                try:
-                    moves[col][index].remove(cell)
-                finally:
-                    continue     
+                moves[col][index].discard(cell)
 
             if (variants[selected_variant] == "Sudoku X"):
                 if(row == col):
                     # Remove values in the same diagonal.
                     for index in range(9):
-                        try:
-                            moves[index][index].remove(cell)
-                        finally:
-                            continue  
+                        moves[index][index].discard(cell)
                 if(row == 8-col):
                     # Remove values in the same diagonal.
                     for index in range(9):
-                        try:
-                            moves[index][8-index].remove(cell)
-                        finally:
-                            continue  
+                        moves[index][8-index].discard(cell)
 
             # Remove values in the same subgrid.
             left_col = int(col/3)*3
             top_row = int(row/3)*3
             for other_row in range(3):       
                 for other_col in range(3):
-                    try:
-                        moves[left_col+other_col][top_row+other_row].remove(cell)
-                    finally:
-                        continue 
+                    moves[left_col+other_col][top_row+other_row].discard(cell)
 
     return moves
 
@@ -402,8 +387,9 @@ def solve(depth, all_solutions, print_solutions):
         for col in range(9):
             for row in range(9):
                 if (len(moves[col][row]) == 1):
-                    grid[col][row] = moves[col][row][0]
-                    move_applied = True
+                    for move in moves[col][row]:
+                        grid[col][row] = move
+                        move_applied = True
         
         if (not move_applied):
             break
@@ -419,12 +405,11 @@ def solve(depth, all_solutions, print_solutions):
             for branch_factor in range(2,10):
                 for col in range(9):
                     for row in range(9):
-                        branches = moves[col][row]
-                        if (len(branches) == branch_factor):
+                        if (len(moves[col][row]) == branch_factor):
                             nb_solved_branches = 0
-                            for branch_index in range(len(branches)):
+                            for move in moves[col][row]:
                                 saved_grid = save_grid()
-                                grid[col][row] = branches[branch_index]
+                                grid[col][row] = move
                                 solved = solve(depth+1, all_solutions, print_solutions)
                                 if (solved):
                                     nb_solved_branches += 1
