@@ -66,10 +66,7 @@ def print_help():
 
 def init_grid():
     for col in range(9):
-        column = []
-        grid.append(column)
-        for row in range(9):
-        	column.append(0)
+        grid.append([0]*9)
 
 def clear_grid():
     for col in range(9):
@@ -235,13 +232,8 @@ def validate_grid(print_violations):
     row_frequencies = []
     column_frequencies = []
     for index in range(9):
-        row_frequency = []
-        row_frequencies.append(row_frequency)
-        column_frequency = []
-        column_frequencies.append(column_frequency)
-        for value in range(10):
-            row_frequency.append(0)
-            column_frequency.append(0)
+        row_frequencies.append([0] * 10)
+        column_frequencies.append([0] * 10)
 
     for col in range(9):
         for row in range(9):
@@ -276,11 +268,8 @@ def validate_grid(print_violations):
 
     if (variants[selected_variant] == "Sudoku X"):
         # Count how many times the values 1-9 appear in each diagonal.
-        diagonal1_frequencies = []
-        diagonal2_frequencies = []
-        for value in range(10):
-            diagonal1_frequencies.append(0)
-            diagonal2_frequencies.append(0)
+        diagonal1_frequencies = [0] * 10
+        diagonal2_frequencies = [0] * 10
 
         for index in range(9):
             diagonal1_frequencies[grid[index][index]] += 1
@@ -338,11 +327,10 @@ def calculate_moves():
         column = []
         moves.append(column)
         for row in range(9):
-            values = set()
-            column.append(values)
             if (grid[col][row] == 0):
-                for value in range(1, 10):
-                    values.add(value)
+                column.append(set(range(1, 10)))
+            else:
+                column.append(set())
     
     # Remove values that would introduce duplicates in the row, column, diagonal or subgrid it is in.
     for col in range(9):
